@@ -40,6 +40,9 @@ HybridEncoder:
     dropout: 0.
     activation: 'gelu'
   expansion: 1.0
+  # Periodic function for positional encoding.
+  # Options: 'sinusoid' (default), 'triangular', 'square', 'sawtooth'
+  periodic_func: sinusoid
 
 
 RTDETRTransformer:

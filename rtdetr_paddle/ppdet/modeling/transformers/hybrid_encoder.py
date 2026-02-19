@@ -128,7 +128,8 @@ class HybridEncoder(nn.Layer):
                  depth_mult=1.0,
                  act='silu',
                  trt=False,
-                 eval_size=None):
+                 eval_size=None,
+                 periodic_func='sinusoid'):
         super(HybridEncoder, self).__init__()
         self.in_channels = in_channels
         self.feat_strides = feat_strides
@@ -137,6 +138,7 @@ class HybridEncoder(nn.Layer):
         self.num_encoder_layers = num_encoder_layers
         self.pe_temperature = pe_temperature
         self.eval_size = eval_size
+        self.periodic_func = periodic_func
 
         # channel projection
         self.input_proj = nn.LayerList()
@@ -196,14 +198,17 @@ class HybridEncoder(nn.Layer):
                 stride = self.feat_strides[idx]
                 pos_embed = self.build_2d_sincos_position_embedding(
                     self.eval_size[1] // stride, self.eval_size[0] // stride,
-                    self.hidden_dim, self.pe_temperature)
+                    self.hidden_dim, self.pe_temperature,
+                    self.periodic_func)
                 setattr(self, f'pos_embed{idx}', pos_embed)
 
     @staticmethod
     def build_2d_sincos_position_embedding(w,
                                            h,
                                            embed_dim=256,
-                                           temperature=10000.):
+                                           temperature=10000.,
+                                           periodic_func='sinusoid'):
+        from .position_encoding import get_periodic_funcs
         grid_w = paddle.arange(int(w), dtype=paddle.float32)
         grid_h = paddle.arange(int(h), dtype=paddle.float32)
         grid_w, grid_h = paddle.meshgrid(grid_w, grid_h)
@@ -216,10 +221,11 @@ class HybridEncoder(nn.Layer):
         out_w = grid_w.flatten()[..., None] @omega[None]
         out_h = grid_h.flatten()[..., None] @omega[None]
 
+        func_even, func_odd = get_periodic_funcs(periodic_func)
         return paddle.concat(
             [
-                paddle.sin(out_w), paddle.cos(out_w), paddle.sin(out_h),
-                paddle.cos(out_h)
+                func_even(out_w), func_odd(out_w),
+                func_even(out_h), func_odd(out_h)
             ],
             axis=1)[None, :, :]
 
@@ -236,7 +242,8 @@ class HybridEncoder(nn.Layer):
                     [0, 2, 1])
                 if self.training or self.eval_size is None:
                     pos_embed = self.build_2d_sincos_position_embedding(
-                        w, h, self.hidden_dim, self.pe_temperature)
+                        w, h, self.hidden_dim, self.pe_temperature,
+                        self.periodic_func)
                 else:
                     pos_embed = getattr(self, f'pos_embed{enc_ind}', None)
                 memory = self.encoder[i](src_flatten, pos_embed=pos_embed)
