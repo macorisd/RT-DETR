@@ -211,6 +211,12 @@ def train_single_wave(args, wave_func, results_dir):
     # Set save_dir so model weights go into the wave directory
     cfg.save_dir = wave_dir
 
+    # Set output_eval so bbox.json (and other eval artefacts) go into
+    # the eval/ subfolder of this wave, alongside the metrics JSON files
+    eval_dir = os.path.join(wave_dir, 'eval')
+    os.makedirs(eval_dir, exist_ok=True)
+    cfg.output_eval = eval_dir
+
     # Init parallel env
     if cfg.get('fleet', False):
         init_fleet_env(cfg.get('find_unused_parameters', False))

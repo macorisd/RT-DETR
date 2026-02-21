@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import six
+import math
 import numpy as np
+
+
+def _is_finite(val):
+    """Check if a float value is finite (not NaN or Inf)."""
+    return math.isfinite(val) if isinstance(val, float) else True
 
 
 def get_det_res(bboxes, bbox_nums, image_id, label_to_cat_id_map, bias=0):
@@ -26,6 +32,9 @@ def get_det_res(bboxes, bbox_nums, image_id, label_to_cat_id_map, bias=0):
             k = k + 1
             num_id, score, xmin, ymin, xmax, ymax = dt.tolist()
             if int(num_id) < 0:
+                continue
+            # Skip entries with NaN or Infinity values (invalid JSON)
+            if not all(_is_finite(v) for v in [score, xmin, ymin, xmax, ymax]):
                 continue
             category_id = label_to_cat_id_map[int(num_id)]
             w = xmax - xmin + bias
