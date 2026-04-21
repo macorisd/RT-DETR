@@ -82,8 +82,16 @@ def draw_comparison(data_per_wave, ylabel, title, save_path, xlabel='Epoch'):
         values = data_per_wave[wave_name]
         if not values:
             continue
+        # Ensure values is a list and contains only numbers
+        if isinstance(values, dict):
+            continue
+        try:
+            values = list(values)
+            values = [float(v) for v in values]
+        except (TypeError, ValueError):
+            continue
         has_data = True
-        epochs = range(1, len(values) + 1)
+        epochs = list(range(1, len(values) + 1))
         color = COLORS.get(wave_name, '#333333')
         plt.plot(epochs, values, color=color, linewidth=2,
                  label=wave_name.capitalize())
