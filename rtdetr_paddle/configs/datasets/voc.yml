@@ -4,18 +4,18 @@ num_classes: 20
 
 TrainDataset:
   name: VOCDataSet
-  dataset_dir: dataset/voc
+  dataset_dir: /mnt/home/users/tic_163_uma/macorisd/fscratch/RT-DETR/rtdetr_paddle/dataset/voc
   anno_path: trainval.txt
   label_list: label_list.txt
   data_fields: ['image', 'gt_bbox', 'gt_class', 'difficult']
 
 EvalDataset:
   name: VOCDataSet
-  dataset_dir: dataset/voc
+  dataset_dir: /mnt/home/users/tic_163_uma/macorisd/fscratch/RT-DETR/rtdetr_paddle/dataset/voc
   anno_path: test.txt
   label_list: label_list.txt
   data_fields: ['image', 'gt_bbox', 'gt_class', 'difficult']
 
 TestDataset:
   name: ImageFolder
-  anno_path: dataset/voc/label_list.txt
+  anno_path: /mnt/home/users/tic_163_uma/macorisd/fscratch/RT-DETR/rtdetr_paddle/dataset/voc/label_list.txt

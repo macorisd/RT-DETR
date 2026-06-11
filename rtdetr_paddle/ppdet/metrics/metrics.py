@@ -128,7 +128,7 @@ class COCOMetric(Metric):
             if self.output_eval:
                 output = os.path.join(self.output_eval, output)
             with open(output, 'w') as f:
-                json.dump(self.results['bbox'], f)
+                json.dump(self.results['bbox'], f, allow_nan=False)
                 logger.info('The bbox result is saved to bbox.json.')
 
             if self.save_prediction_only:

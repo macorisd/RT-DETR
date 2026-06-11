@@ -434,9 +434,16 @@ def _check_exist_file_md5(filename, md5sum, url):
 def _md5check_from_url(filename, url):
     # For weights in bcebos URLs, MD5 value is contained
     # in request header as 'content_md5'
-    req = requests.get(url, stream=True)
-    content_md5 = req.headers.get('content-md5')
-    req.close()
+    try:
+        req = requests.get(url, stream=True, timeout=10)
+        content_md5 = req.headers.get('content-md5')
+        req.close()
+    except Exception:
+        # If network is unavailable (e.g. on compute nodes without
+        # internet), skip MD5 check and trust the local file.
+        logger.warning("Cannot reach {} for MD5 check, skipping "
+                       "verification for {}".format(url, filename))
+        return True
     if not content_md5 or _md5check(
             filename,
             binascii.hexlify(base64.b64decode(content_md5.strip('"'))).decode(
