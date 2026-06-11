@@ -1,3 +1,11 @@
+# RT-DETR architecture - Master's Thesis by Macorís Decena Giménez
+
+This fork was developed as part of my Master's Thesis, which studies the replacement of the original sinusoidal positional encoding used in Transformer-based architectures with alternative periodic functions. In this repository, RT-DETR has been adapted to evaluate the effect of alternative positional encoding waveforms in a real-time object detection Transformer architecture.
+
+The trained model weights are available in Google Drive: [https://drive.google.com/drive/folders/1IxeLRsapGrlCpydSH6j553VWeqcCe1LQ?usp=sharing](https://drive.google.com/drive/folders/1IxeLRsapGrlCpydSH6j553VWeqcCe1LQ?usp=sharing)
+
+---
+
 English | [简体中文](README_cn.md)
 
 
